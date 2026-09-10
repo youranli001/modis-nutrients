@@ -1,0 +1,29 @@
+# MODIS -> nutrients: default experiment (rebuilt monthly file, January).
+# Relative paths are resolved against the repository root.
+
+data:
+  path: data/satellite_and_WOA13_1deg_monthly.nc
+  raw_dir: data/raw                                     # `download` target
+  built_path: data/satellite_and_WOA13_1deg_monthly.nc  # `build` output
+  months: [1]
+  features: [CHL, APH, FLU, PIC, POC, PAR, SST]
+  targets: [nitrate, phosphate, silicate]
+  log_features: [CHL, APH, PIC, POC]   # log10 before scaling; geometric mean when regridding
+  max_missing_features: 0              # rows with more missing features are dropped
+
+split:
+  block_deg: 20                # tile size; variogram range is ~2000-2500 km
+  buffer_km: 500               # training cells closer than this to val/test are dropped
+  seed: 42
+
+variogram:
+  max_km: 4000
+  bin_km: 100
+  detrend_band_deg: 5
+  sampling_size: 3000
+
+models:
+  gbm: {max_iter: 500, learning_rate: 0.05, max_leaf_nodes: 31, l2_regularization: 1.0}
+  mlp: {hidden: [64, 32], epochs: 300, batch_size: 256, learning_rate: 0.001, patience: 25}
+  latlon_knn: {n_neighbors: 10}
+  zonal_mean: {band_deg: 5}

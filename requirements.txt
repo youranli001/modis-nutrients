@@ -1,0 +1,12 @@
+numpy>=1.24
+pandas>=2.0
+xarray>=2023.1
+netCDF4>=1.6
+scipy>=1.10
+scikit-learn>=1.4
+pyyaml>=6
+matplotlib>=3.7
+tabulate>=0.9
+gstools>=1.5
+optuna>=3.0
+shap>=0.44

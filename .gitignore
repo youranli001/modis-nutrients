@@ -1,0 +1,26 @@
+# data and run outputs are not versioned; the README says how to regenerate them
+data/*.nc
+data/raw/
+*.h5
+*.keras
+
+# python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+.venv/
+
+# editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# never commit credentials
+.env
+*.pem

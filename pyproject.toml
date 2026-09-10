@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "modis-nutrients"
+version = "0.2.0"
+description = "Predict surface nitrate, phosphate and silicate from MODIS ocean-colour products with leakage-aware spatial evaluation"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Youran Li" }]
+dependencies = [
+  "numpy>=1.24",
+  "pandas>=2.0",
+  "xarray>=2023.1",
+  "netCDF4>=1.6",
+  "scipy>=1.10",
+  "scikit-learn>=1.4",
+  "pyyaml>=6",
+  "matplotlib>=3.7",
+  "tabulate>=0.9",
+  "gstools>=1.5",
+  "optuna>=3.0",
+  "shap>=0.44",
+]
+
+[project.optional-dependencies]
+keras = ["tensorflow-cpu>=2.15"]
+maps = ["cartopy>=0.22"]
+dev = ["pytest>=7", "ruff>=0.4", "jupyter", "nbformat"]
+
+[project.scripts]
+modis-nutrients = "modis_nutrients.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W", "B"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
