@@ -1,0 +1,54 @@
+# CD: execute the results notebook on SageMaker with the same code that passed CI.
+#
+# Triggers: the "Run workflow" button in the Actions tab (workflow_dispatch), and
+# optionally a schedule. Authentication is GitHub -> AWS OIDC: no AWS keys are
+# stored in GitHub. Setup is described in docs/aws_setup.md.
+
+name: sagemaker
+
+on:
+  workflow_dispatch:
+    inputs:
+      instance_type:
+        description: "SageMaker instance type"
+        default: "ml.m5.xlarge"
+  # schedule:
+  #   - cron: "0 6 * * 1"   # every Monday 06:00 UTC
+
+permissions:
+  id-token: write   # needed for OIDC
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -e ".[dev]"
+      - run: ruff check src tests aws
+      - run: pytest -q
+
+  run-on-sagemaker:
+    needs: test            # only after the tests pass
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_GITHUB_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+      - run: pip install sagemaker
+      - name: Launch the SageMaker job
+        run: |
+          python aws/run_sagemaker.py \
+            --bucket "${{ vars.S3_BUCKET }}" \
+            --role "${{ secrets.SAGEMAKER_EXECUTION_ROLE_ARN }}" \
+            --instance-type "${{ github.event.inputs.instance_type || 'ml.m5.xlarge' }}" \
+            --experiment modis-nutrients
