@@ -33,7 +33,9 @@ def main() -> None:
         print(f"staged {f.name}", flush=True)
 
     subprocess.run([sys.executable, "-m", "nbconvert", "--to", "notebook", "--execute", "--inplace",
-                    "--ExecutePreprocessor.timeout=3600", args.notebook], check=True)
+                "--ExecutePreprocessor.timeout=3600",
+                "--ExecutePreprocessor.kernel_name=python3",      
+                args.notebook], check=True)
 
     out = Path(args.model_dir)
     out.mkdir(parents=True, exist_ok=True)
